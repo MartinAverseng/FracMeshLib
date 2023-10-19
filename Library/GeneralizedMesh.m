@@ -96,8 +96,8 @@ classdef GeneralizedMesh
         end
         
         % Subsimplices
-        function [F,set2sub,sub2set] = subsimplices(M,d)
-            [F,set2sub,sub2set]  = subsetsRows(M.elt,d+1);
+        function [S,set2sub,sub2set] = subsimplices(M,d)
+            [S,set2sub,sub2set]  = subsetsRows(M.elt,d+1);
         end
         
         function dM = genBoundary(M)
@@ -105,8 +105,8 @@ classdef GeneralizedMesh
         end
         
         % Generalized subfacets
-        function [F,gamma,I] = generalizedSubfacets(M,d)
-            [F,gamma,I] = genSubFcts(M,d);
+        function [S,gamma,I] = generalizedSubfacets(M,d)
+            [S,gamma,I] = genSubFcts(M,d);
         end
         
         % Refine
@@ -130,7 +130,7 @@ classdef GeneralizedMesh
             assert(M.n == 2,'Can only plot triangular fractured meshes');
             % Will only produce good plots for cracked 2D domains.
             m = msh(M.vtx,M.elt);
-            plot(m);
+            patch('Faces',m.elt,'Vertices',m.vtx,'FaceColor',[20,43,140]/255,'EdgeColor','k','LineWidth',3);
             hold on;
             for i=1:M.nelt
                 for alpha = 1:M.n+1
@@ -142,7 +142,7 @@ classdef GeneralizedMesh
                         C = M.vtx(M.elt(i,alpha),:);
                         O = (A + B + C)/3;
                         I = (A + B)/2;
-                        plot3([O(1) I(1)],[O(2) I(2)],[O(3) I(3)],'-green','LineWidth',3);
+                        plot3([O(1) I(1)],[O(2) I(2)],[O(3) I(3)],'-','Color',[25/256 140/256 21/256],'LineWidth',3);
                         %text(O(1),O(2),O(3),['K_{',num2str(i),'}'],'FontSize',20);
                     end
                 end

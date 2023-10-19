@@ -23,16 +23,18 @@ clear all;
 Omega = mshDisk(15,1);
 
 
-V = [Omega.vtx(1,:);Omega.vtx(2,:);Omega.vtx(4,:);Omega.vtx(13,:);Omega.vtx(6,:)];
-E = [1 2; 1 3; 3 4; 1 5];
+V = [Omega.vtx(1,:);Omega.vtx(2,:);Omega.vtx(4,:);Omega.vtx(13,:);Omega.vtx(6,:);Omega.vtx(3,:);Omega.vtx(7,:)];
+E = [1 2; 1 3; 3 4; 1 5;3,6;1,7];
 mGamma = msh(V,E);
 
 
 
 M = fracturedMesh(Omega,mGamma);
 plotFracturedMesh(M);
+M = M.refine(1);
 hold on;
-plot(mGamma,'r');
+pGamma = patch('Faces',mGamma.elt,'Vertices',mGamma.vtx,'EdgeColor','r','LineWidth',3,'Marker','.','MarkerSize',25);
+
 
 Gamma = dom(M,7);
 gfe = GenFem(M,'P1');
@@ -43,14 +45,35 @@ Stiff = integral(Gamma,grad(gfe),grad(gfe));
 [P,D] = eig(full(Mass\Stiff));
 [d,I] = sort(diag(D));
 
-neig = 9;
-[X,T] = dof(gfe);
-X(:,3) = P(:,I(neig));
+%%
+
+U = Stiff\rhs;
 figure
-patch('Faces',T,'Vertices',X,'FaceVertexCData',P(:,I(neig)),'FaceColor','interp');
+patch('Faces',T,'Vertices',X,'FaceVertexCData',U,'FaceColor','interp','EdgeColor','interp');
+axis equal
+colormap(jet)
 hold on
-mGamma.vtx(:,3) = 0.5;
-plot(mGamma,'r');
+patch('Faces',mGamma.elt,"Vertices",mGamma.vtx,'LineWidth',3,'EdgeColor','k');
+axis off
+
+
+%% Choose eig and plot
+
+neig = 10;
+[X,T] = dof(gfe);
+% X(:,3) = P(:,I(neig));
+figure
+patch('Faces',T,'Vertices',X,'FaceVertexCData',P(:,I(neig)),'FaceColor','interp','EdgeColor','interp');
+
+hold on
+patch('Faces',mGamma.elt,"Vertices",mGamma.vtx,'LineWidth',3,'EdgeColor','k');
+axis equal
+axis off
+colormap(jet)
+hold on
+edg = M.subsimplices(1);
+% patch('Faces',edg,'Vertices',M.vtx,'EdgeColor',[0.5 0.5 0.5]);
+
 
 %% Circle with cracked radius
 clear all;

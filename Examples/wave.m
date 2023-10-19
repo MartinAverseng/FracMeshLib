@@ -1,0 +1,123 @@
+%% Toy script for FEM in space / FD in time applied to the PDE
+% Solves 1/c^2 d^2 u/ dt^2 - Delta u = 0 in Omega \ Gamma
+% u(0,x) = u0(x)
+% du/dt(0,x)= 0
+% du/dn = 0 at the boundary of Omega \ Gamma
+% Omega regular polygon, Gamma fracture in Omega
+% Note that the Neumann condition at the fracture is applied "independently
+% on both sides". 
+
+clear all %#ok
+close all
+
+
+cd Library
+addpath(genpath(pwd));
+cd ..
+
+clc;
+
+
+%% Creating geometry
+close all
+disp("Creating geometry");
+
+% Domain (disk)
+Ndisk = 80;
+Omega = mshDisk(Ndisk,1);
+
+% Fracture
+V = [Omega.vtx(1,:);Omega.vtx(2,:);Omega.vtx(4,:);Omega.vtx(13,:);Omega.vtx(6,:);Omega.vtx(3,:);Omega.vtx(7,:)];
+E = [1 2; 1 3; 3 4; 1 5;3,6;1,7];
+mGamma = msh(V,E); 
+% Fracture is constructed as a subset of the edges of Omega. 
+
+
+M = fracturedMesh(Omega,mGamma);
+plotFracturedMesh(M);
+hold on;
+pGamma = patch('Faces',mGamma.elt,'Vertices',mGamma.vtx,'EdgeColor','r','LineWidth',3,'Marker','.','MarkerSize',25);
+axis equal
+axis off
+title("Generalized mesh $\mathcal{M}^*_{\Omega \setminus \Gamma}$",'Interpreter','latex')
+
+%% Assembling
+
+disp("Assembling")
+M = M.refine(3);
+
+domOmega = dom(M,7); % Quadrature rules on elements of M
+Vh = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
+% (= conforming piecewise linear element in the energy space 
+% ||u||^2_{L^2(Omega)} + ||p||^2_{L^2(Omega)} < inf
+% where p = weak gradient of u on Omega \ Gamma (not the same as
+% distributional gradient)
+
+
+[X,T] = Vh.dof; % Dofs of Vh are given by the generalized vertices. 
+Mass = integral(domOmega,Vh,Vh);
+K = integral(domOmega,grad(Vh),grad(Vh));
+
+%% Time finite-difference scheme and LU factorization
+
+c=1; % wave speed
+dt = 0.005; % time-step
+theta = 0.26;
+delta = 0.53; % Newark (theta,delta) scheme
+Op = Mass/dt^2 + c^2*theta*K;
+
+
+[L,U] = lu(Op);
+
+%% Initial data
+
+posX = 0.2;
+posY = 0.65;
+rad = 0.2;
+U0 = @(X)(((X(:,1)-posX).^2 + (X(:,2) - posY).^2 < rad^2).*(exp(-rad^2./(max(rad^2-((X(:,1)-posX).^2 + (X(:,2) - posY).^2),eps)))));
+% bump function supported in B((posX,posY),rad) 
+a = integral(domOmega,Vh,U0); % Projection on Finite element space
+
+U1h = Mass\a;
+U0h = Mass\a;
+U00 = U0h;
+
+
+%% Pre-compute the solutions at every time step
+disp("Storing solution data")
+maxTimeStep = 500;
+pp = cell(maxTimeStep,1);
+for n = 1:maxTimeStep
+    if (mod(n,50) == 0)
+        fprintf('Done up to time step %d\n',n);
+    end
+    rhs = Mass/dt^2*(2*U1h - U0h) ...
+        - c^2*K*(1/2 + delta - 2*theta)*U1h ...
+        - c^2*K*(1/2 - delta + theta)*U0h;
+    U2h = U\(L\rhs);
+    U0h = U1h;
+    U1h = U2h;
+    pp{n} = U2h;
+end
+
+%% Play the movie
+
+
+close all
+figure;
+disp("Displaying animation")
+
+p = patch('Faces',T,'Vertices',X,'FaceVertexCData',pp{1},'FaceColor','interp','EdgeColor','interp'); 
+patch('Faces',mGamma.elt,"Vertices",mGamma.vtx,'LineWidth',3,'EdgeColor','r')
+
+colormap(gray);
+caxis([0 0.1])
+axis equal;
+axis off
+
+for n = 1:500
+    p.FaceVertexCData = pp{n};
+    drawnow;
+end
+
+
