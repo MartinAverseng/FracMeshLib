@@ -22,7 +22,7 @@ A n-dimensional generalized mesh is defined by supplying
 The adjacency specifies, for each element i = 1,...,N, and each (n-1)-dimensional face <math>F</math> of the simplex Si, whether i has a neighbor element j <i>through</i> <math>F</math>. It must satisfy the following axioms.
 
 (i) If elements i and j are adjacents through F, then F is a facet of both Si and Sj <br>
-(ii) Adjacency is symmetric: element i is adjacent to j through F <math>=></math> element j is adjacent to i through F<br>
+(ii) Adjacency is symmetric: element i is adjacent to j through F <i>iff</i> element j is adjacent to i through F<br>
 (iii) For each facet <math>F</math> of Si, element i is adjacent to <i>at most</i> one element j through <math>F</math>
 
 ### Examples
@@ -81,7 +81,7 @@ The pair (`vtx`,`elt`) works like for a normal Gmsh-type mesh, except now the ar
 
 ### Subsimplices
 
-The d-subsimplices of a generalized mesh `M` are the d-subsets (V1,...,Vd) of the vertices of some element of `M`. Call
+The d-subsimplices of a generalized mesh `M` are the d-subsets (S<sub>1</sub> ,...,S<sub>d</sub>) of the vertices of some element of `M`. Call
 
 ```  
 [Slist,set2sub,sub2set] = subsimplices(M,d)
@@ -137,4 +137,4 @@ When given only the simplices of the boundary of a fractured mesh, without the a
 
 Spaces of discrete d-differential forms can be defined on Generalized Meshes, and these can be used to consider conforming Galerkin methods in fractured domains for 2nd order PDEs. The key idea is that the degrees of freedom of the d-dimensional finite element spaces (d= 0: P1 Lagrange, d=1: Nédélec, d=n-1:Raviart-Thomas, d=n: Piecewise constant) are exactly the generalized d-subfacets discussed above.
 
-Here we discuss this in the simplest case of d=0. For each generalized vertex <b>s</b> = (S,gamma), the basis function ϕ<sub><b>s</b></sub> is the usual tent function at S <i>multiplied by the indicator function of the union of the elements in gamma</i>.  
+Here we discuss this in the simplest case of d=0. For each generalized vertex <b>s</b> = (S,gamma), the basis function ϕ<sub><b>s</b></sub> is the usual tent function at S <i>multiplied by the indicator function of the union of the elements in gamma</i>. The set of discrete 0-forms, or P1 finite element space, is the vector space spanned by {ϕ<sub><b>s</b></sub>}<sub><b>s</b> generalized vertex of M</sub>
