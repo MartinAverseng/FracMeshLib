@@ -10,6 +10,11 @@ It allows to define and manipulate <i> Generalized meshes</i>, which is a struct
 |![](Examples/fractureNetwork.png)|![](Examples/wave.gif)|
 
 
+# Table of contents
+1. [What is a Generalized mesh](#what-is-a-generalized-mesh)
+2. [Class definition and methods](##class-definition-and-methods)
+3. [Finite Element Methods in fractured Meshes](#finite-element-methods-in-fractured-meshes)
+
 ## What is a Generalized Mesh
 
 ### Definition
@@ -148,18 +153,12 @@ to use this algorithm. Roughly speaking, `M` represents a two sided version of `
 
 Spaces of discrete d-differential forms can be defined on Generalized Meshes, and these can be used to consider conforming Galerkin methods in fractured domains for 2nd order PDEs. The key idea is that the degrees of freedom of the d-dimensional finite element spaces (d= 0: P1 Lagrange, d=1: Nédélec, d=n-1:Raviart-Thomas, d=n: Piecewise constant) are exactly the generalized d-subfacets discussed above.
 
-Here we discuss this in the simplest case of d=0. For each generalized vertex <b>s</b> = (S,gamma), the basis function ϕ<sub><b>s</b></sub> is the usual tent function at S <i>multiplied by the indicator function of the union of the elements in gamma</i>. The set Λ<sup>0</sup>(M) of discrete 0-forms, or P1 finite element space, is the vector space spanned by {ϕ<sub><b>s</b></sub>}<sub><b>s</b> generalized vertex of M</sub>
+Here we discuss this in the simplest case of d=0. For each generalized vertex <b>s</b> = (S,gamma), the basis function ϕ<sub><b>s</b></sub> is the usual tent function at S <i>multiplied by the indicator function of the union of the elements in gamma</i>. The set Λ<sup>0</sup>(M) of discrete 0-forms, or P1 finite element space, is the vector space spanned by {ϕ<sub><b>s</b></sub>}<sub><b>s</b></sub> for all generalized vertices <b>s</b>.
 
-#### Conformity for FEM
+Why this space is important is due to the fact that, when M is a fractured mesh of Omega\\ Gamma, then
 
-If M is a fractured mesh (the meshes suited to FEM) of Omega\\ Gamma, then Λ<sup>0</sup>(M) = {u in H^1(Omega\\ Gamma) : u is affine on each element of M}. Note that functions in Λ<sup>0</sup>(M) may jump across the fracture).
+Λ<sup>0</sup>(M) = {u in H^1(Omega\\ Gamma) : u is affine on each element of M}.
 
-#### Conformity for BEM
+that is, Λ<sup>0</sup>(M) is a finite-dimensional subspace of the energy space.
 
-If dM is the boundary of a fractured mesh, and assuming that the fracture has no point contacts [Fractured meshes, Thm 5.2], then
-
-Λ<sup>0</sup>(dM) = Tr (Λ<sup>0</sup>(dM))
-
-where Tr is the operator of restriction to the (two-sided) boundary (aka multi-trace operator).
-
-###
+### Assembling of FEM matrices
