@@ -151,7 +151,7 @@ to use this algorithm. Roughly speaking, `M` represents a two sided version of `
 
 ### Whitney forms on M
 
-Spaces of discrete d-differential forms can be defined on Generalized Meshes, and these can be used to consider conforming Galerkin methods in fractured domains for 2nd order PDEs. The key idea is that the degrees of freedom of the d-dimensional finite element spaces (d= 0: P1 Lagrange, d=1: Nédélec, d=n-1:Raviart-Thomas, d=n: Piecewise constant) are exactly the generalized d-subfacets discussed above.
+Spaces of discrete d-differential forms can be defined on Generalized Meshes, and these can be used to consider conforming Galerkin methods in fractured domains for 2nd order PDEs. The key idea is that the degrees of freedom of the d-dimensional finite element spaces (d= 0: P1 Lagrange, d=1: Nédélec, d=n-1:Raviart-Thomas, d=n: Piecewise constant) are exactly the generalized d-subfacets defined above.
 
 Here we discuss this in the simplest case of d=0. For each generalized vertex <b>s</b> = (S,gamma), the basis function ϕ<sub><b>s</b></sub> is the usual tent function at S <i>multiplied by the indicator function of the union of the elements in gamma</i>. The set Λ<sup>0</sup>(M) of discrete 0-forms, or P1 finite element space, is the vector space spanned by {ϕ<sub><b>s</b></sub>}<sub><b>s</b></sub> for all generalized vertices <b>s</b>.
 
@@ -159,6 +159,16 @@ Why this space is important is due to the fact that, when M is a fractured mesh 
 
 Λ<sup>0</sup>(M) = {u in H^1(Omega\\ Gamma) : u is affine on each element of M}.
 
-that is, Λ<sup>0</sup>(M) is a finite-dimensional subspace of the energy space.
+In other words, Λ<sup>0</sup>(M) is a finite-dimensional subspace of the energy space.
 
 ### Assembling of FEM matrices
+
+Consider the PDE
+
+-Δu + cu = f(x) in Ω \\ Γ
+
+with Neumann boundary conditions on ∂Ω and on Γ. The variational formulation of this problem reads
+
+Find u in H<sup>1</sup>( Ω \\ Γ) such that, for all v in H<sup>1</sup>( Ω \\ Γ),
+
+( ∇ u, ∇ v )<sub>L<sup>2</sup>(Ω \\ Γ)</sub> + c(u,v)<sub>L<sup>2</sup>(Ω \\ Γ)</sub> = (f,v)<sub>L<sup>2</sup>(Ω \\ Γ)</sub>
