@@ -48,17 +48,16 @@ title("Generalized mesh $\mathcal{M}^*_{\Omega \setminus \Gamma}$",'Interpreter'
 disp("Assembling")
 M = M.refine(2);
 
-domOmega = dom(M,7); % Quadrature rules on elements of M
-Vh = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
+ngauss = 7;
+domOmega = dom(M,ngauss); % Quadrature rules on elements of M
+Lambda0M = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
 % (= conforming piecewise linear element in the energy space 
 % ||u||^2_{L^2(Omega)} + ||p||^2_{L^2(Omega)} < inf
 % where p = weak gradient of u on Omega \ Gamma (not the same as
 % distributional gradient)
 
-
-[X,T] = Vh.dof; % Dofs of Vh are given by the generalized vertices. 
-Mass = integral(domOmega,Vh,Vh);
-K = integral(domOmega,grad(Vh),grad(Vh));
+Mass = integral(domOmega,Lambda0M,Lambda0M);
+K = integral(domOmega,grad(Lambda0M),grad(Lambda0M));
 
 %% Time finite-difference scheme and LU factorization
 
@@ -79,13 +78,15 @@ posY = 0.65;
 rad = 0.2;
 U0 = @(X)(((X(:,1)-posX).^2 + (X(:,2) - posY).^2 < rad^2).*(exp(-rad^2./(max(rad^2-((X(:,1)-posX).^2 + (X(:,2) - posY).^2),eps)))));
 % bump function supported in B((posX,posY),rad) 
-a = integral(domOmega,Vh,U0); % Projection on Finite element space
+a = integral(domOmega,Lambda0M,U0); % Projection on Finite element space
 
 U0h = Mass\a; 
 U1h = U0h; % 0 initial speed
 
 %% Pre-compute the solutions at every time step
 disp("Storing solution data")
+
+
 maxTimeStep = 1000;
 pp = cell(maxTimeStep,1);
 for n = 1:maxTimeStep
@@ -105,6 +106,8 @@ end
 
 close all
 figure;
+[X,T] = Lambda0M.dof; % Dofs of Lambda0M are given by the generalized vertices. 
+
 disp("Displaying animation")
 
 p = patch('Faces',T,'Vertices',X,'FaceVertexCData',pp{1},'FaceColor','interp','EdgeColor','interp'); 

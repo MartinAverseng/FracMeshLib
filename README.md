@@ -10,6 +10,8 @@ It allows to define and manipulate <i> Generalized meshes</i>, which is a struct
 |![](doc/fractureNetwork.png)|![](doc/wave.gif)|
 
 Run these examples by opening Matlab in Examples, and run the scripts `fractureNetwork.m` and `wave.m`. Refer to [this code](https://github.com/MartinAverseng/multi-screen-bem3D-ddm/) for BEM computations.
+Numerical experiments from the paper about the disk with cracked radius can be reproduced by running the scripts in FEMExperiments folder. 
+
 
 # Table of contents
 1. [What is a Generalized mesh](#what-is-a-generalized-mesh)
@@ -200,12 +202,12 @@ where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of 
 To assemble these matrices, first call
 
 ```
-nquad = 3;
+ngauss = 3;
 domOmega = dom(M,nquad);
 ```
 to construct local Gaussian quadrature rules on each element. Then call
 ```
-M = integral(domOmega,Lambda0M,Lambda0M);
+Mass = integral(domOmega,Lambda0M,Lambda0M);
 K = integral(domOmega,grad(Lambda0M),grad(Lambda0M));
 ```
 where `Lambda0M = GenFem(M,'P1')`. If f(X) = sin(X<sub>1</sub>), then the right hand side vector can be computed via
@@ -218,7 +220,7 @@ Solve the linear system using
 
 ```
 c = 0.01;
-U = (K + c*M)\L;
+U = (K + c*Mass)\L;
 ```
 Plot the solution e.g. using this code
 ```
