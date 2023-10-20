@@ -94,7 +94,7 @@ The d-subsimplices of a generalized mesh `M` are all the d-subsimplices of its e
 ```  
 [Slist,set2sub,sub2set] = subsimplices(M,d)
 ```
-to get all d-subsimplices of M. The i-th line of Slist, `[Slist(i,1),...,Slist(i,d)]` encodes a unique subsimplex S<sub>i</sub> of `M`, referring to vertices by their index in `M.vtx`.
+to get all d-subsimplices of M. The i-th line of Slist, `[Slist(i,1),...,Slist(i,d)]` encodes a unique d-subsimplex S<sub>i</sub> of `M`, referring to vertices by their index in `M.vtx`.
 
 - `set2sub` is an array of size Nelt x Nd, where Nd = (n choose d) is the number of d-subsimplices per element. The k-th line of `set2sub` tells at what positions the subsimplices of element k are in `Slist`.
 - `sub2set` is a `Nelt x N` sparse "incidence" matrix filled with 0s and 1s, with coefficient (k,i) equal to 1 when element k contains subsimplex S<sub>i.
@@ -203,7 +203,7 @@ To assemble these matrices, first call
 
 ```
 ngauss = 3;
-domOmega = dom(M,nquad);
+domOmega =dom(M,ngauss);
 ```
 to construct local Gaussian quadrature rules on each element. Then call
 ```
