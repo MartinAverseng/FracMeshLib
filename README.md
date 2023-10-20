@@ -7,8 +7,9 @@ It allows to define and manipulate <i> Generalized meshes</i>, which is a struct
 
 | FEM Solution of a 2nd order boundary value problem in a randomly generated "fracture network" with Neumann conditions at the boundary | FEM in space/FD in time solution of the wave equation in the complement a complex obstacle |
 :----:|:-----:
-|![](Examples/fractureNetwork.png)|![](Examples/wave.gif)|
+|![](doc/fractureNetwork.png)|![](doc/wave.gif)|
 
+Run these examples by opening Matlab in Examples, and run the scripts `fractureNetwork.m` and `wave.m`. Refer to [this code](https://github.com/MartinAverseng/multi-screen-bem3D-ddm/) for BEM computations.
 
 # Table of contents
 1. [What is a Generalized mesh](#what-is-a-generalized-mesh)
@@ -194,7 +195,7 @@ where the stiffness and mass matrices <b>K</b>, <b>M</b> are given by
 
 <b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>), &nbsp;&nbsp;&nbsp; <b>M</b><sub>i,j</sub> = (ϕ<sub><b>s</b><sub>i</sub></sub>,ϕ<sub><b>s</b><sub>j</sub></sub>) &nbsp;&nbsp;&nbsp; 1 <= i,j <= N<sub>dof</sub>
 
-where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M. 
+where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M.
 
 To assemble these matrices, first call
 
@@ -221,7 +222,7 @@ U = (K + c*M)\L;
 ```
 Plot the solution e.g. using this code
 ```
-close all;
+[X,T] = Lambda0M.dof;
 figure;
 patch('Faces',T,'Vertices',X,'FaceVertexCData',U,'FaceColor','interp','EdgeColor','interp');
 patch('Faces',mGamma.elt,"Vertices",mGamma.vtx,'LineWidth',3,'EdgeColor','k')

@@ -10,12 +10,14 @@
 clear all %#ok
 close all
 
-
+cd ..
 cd Library
 addpath(genpath(pwd));
 cd ..
+cd Examples
 
 clc;
+
 
 
 %% Creating geometry
@@ -32,7 +34,7 @@ E = [1 2; 1 3; 3 4; 1 5;3,6;1,7];
 mGamma = msh(V,E); 
 % Fracture is constructed as a subset of the edges of Omega. 
 
-
+% Construct the fractured mesh and plot it
 M = fracturedMesh(Omega,mGamma);
 plotFracturedMesh(M);
 hold on;
@@ -44,7 +46,7 @@ title("Generalized mesh $\mathcal{M}^*_{\Omega \setminus \Gamma}$",'Interpreter'
 %% Assembling
 
 disp("Assembling")
-M = M.refine(3);
+M = M.refine(2);
 
 domOmega = dom(M,7); % Quadrature rules on elements of M
 Vh = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
@@ -60,13 +62,14 @@ K = integral(domOmega,grad(Vh),grad(Vh));
 
 %% Time finite-difference scheme and LU factorization
 
+
 c=1; % wave speed
 dt = 0.005; % time-step
 theta = 0.26;
 delta = 0.53; % Newark (theta,delta) scheme
 Op = Mass/dt^2 + c^2*theta*K;
 
-
+disp('Factorization of operator')
 [L,U] = lu(Op);
 
 %% Initial data
@@ -78,14 +81,12 @@ U0 = @(X)(((X(:,1)-posX).^2 + (X(:,2) - posY).^2 < rad^2).*(exp(-rad^2./(max(rad
 % bump function supported in B((posX,posY),rad) 
 a = integral(domOmega,Vh,U0); % Projection on Finite element space
 
-U1h = Mass\a;
-U0h = Mass\a;
-U00 = U0h;
-
+U0h = Mass\a; 
+U1h = U0h; % 0 initial speed
 
 %% Pre-compute the solutions at every time step
 disp("Storing solution data")
-maxTimeStep = 500;
+maxTimeStep = 1000;
 pp = cell(maxTimeStep,1);
 for n = 1:maxTimeStep
     if (mod(n,50) == 0)
@@ -102,7 +103,6 @@ end
 
 %% Play the movie
 
-
 close all
 figure;
 disp("Displaying animation")
@@ -115,7 +115,7 @@ caxis([0 0.1])
 axis equal;
 axis off
 
-for n = 1:500
+for n = 1:maxTimeStep
     p.FaceVertexCData = pp{n};
     drawnow;
 end

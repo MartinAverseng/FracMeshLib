@@ -8,10 +8,11 @@
 clear all %#ok
 close all
 
-
+cd ..
 cd Library
 addpath(genpath(pwd));
 cd ..
+cd Examples
 
 clc;
 
@@ -25,19 +26,14 @@ Nmesh = 70;
 Omega = mshSquare(Nmesh,[1,1]);
 
 % Fracture
-I = rand(size(Omega.edg.elt,1),1)<0.35;
+I = rand(size(Omega.edg.elt,1),1)<0.35; % select random edges in Omega
 mGamma = Omega.edg.sub(I);
 mGamma = setdiff(mGamma,Omega.bnd);
 ind = find(ismember(mGamma.vtx,Omega.bnd.vtx,'rows'));
-ind = find(sum(ismember(mGamma.elt,ind),2)==0);
-mGamma = mGamma.sub(ind);
+ind = find(sum(ismember(mGamma.elt,ind),2)==0); 
+mGamma = mGamma.sub(ind); % remove edges touching the boundary
 
-
-
-
-% Fracture is constructed as a subset of the edges of Omega. 
-
-
+% Create the fractured mesh and plot it
 M = fracturedMesh(Omega,mGamma);
 plotFracturedMesh(M);
 hold on;
@@ -51,25 +47,27 @@ title("Generalized mesh $\mathcal{M}^*_{\Omega \setminus \Gamma}$",'Interpreter'
 disp("Assembling")
 M = M.refine(3);
 
-domOmega = dom(M,7); % Quadrature rules on elements of M
-Vh = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
+ngauss = 7;
+domOmega = dom(M,ngauss); % Quadrature rules on elements of M
+Lambda0M = GenFem(M,'P1'); % Space of 0-Whitney forms on M 
 % (= conforming piecewise linear element in the energy space 
 % ||u||^2_{L^2(Omega)} + ||p||^2_{L^2(Omega)} < inf
 % where p = weak gradient of u on Omega \ Gamma (not the same as
 % distributional gradient)
 
 
-[X,T] = Vh.dof; % Dofs of Vh are given by the generalized vertices. 
-Mass = integral(domOmega,Vh,Vh);
-K = integral(domOmega,grad(Vh),grad(Vh));
+[X,T] = Lambda0M.dof; % Dofs of Vh are given by the generalized vertices. 
+Mass = integral(domOmega,Lambda0M,Lambda0M);
+K = integral(domOmega,grad(Lambda0M),grad(Lambda0M));
 
 %% 
 
-rhs = integral(domOmega,Vh,@(X)(sin(6*pi*X(:,2))));
+L = integral(domOmega,Lambda0M,@(X)(sin(6*pi*X(:,2))));
 
 %% Solving
 
-U = (Mass + 0.01*K)\rhs;
+c = 0.01;
+U = (Mass + c*K)\L;
 
 %% Plotting solution
 
