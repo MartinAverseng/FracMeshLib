@@ -12,7 +12,7 @@ It allows to define and manipulate <i> Generalized meshes</i>, which is a struct
 
 # Table of contents
 1. [What is a Generalized mesh](#what-is-a-generalized-mesh)
-2. [Class definition and methods](##class-definition-and-methods)
+2. [Class definition and methods](#class-definition-and-methods)
 3. [Finite Element Methods in fractured Meshes](#finite-element-methods-in-fractured-meshes)
 
 ## What is a Generalized Mesh
