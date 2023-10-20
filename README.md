@@ -187,3 +187,7 @@ Find u<sub>h</sub> in Λ<sup>0</sup>(M) such that, for all v<sub>h</sub> in Λ<s
 (∇u<sub>h</sub>,∇v<sub>h</sub>)<sub>L<sup>2</sup>(Ω \\ Γ)</sub> + c(u<sub>h</sub>,v<sub>h</sub>)<sub>L<sup>2</sup>(Ω \\ Γ)</sub> = (f,v<sub>h</sub>)<sub>L<sup>2</sup>(Ω \\ Γ)</sub>
 
 This is equivalent to the linear system
+
+(<b>K</b> + c<b>M</b>)U = L
+
+where  
