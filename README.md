@@ -3,7 +3,7 @@
 
 This Matlab toolbox contains implementations for the methods described in the paper <br>
 [Averseng, Claeys, Hiptmair: Fractured Meshes. <i>FINEL</i> (2023)](https://www.sciencedirect.com/science/article/pii/S0168874X22001809) <br>
-It allows to define and manipulate <i> Generalized meshes</i>, which is a structure modeling meshes of non-manifold geometries. It includes in particular fractured meshes, useful for Finite Element Methods (FEM) in fractured domains, and inflated meshes useful for Boundary Element Methods (BEM) for non-manifold boundaries (see, e.g., [this paper](https://arxiv.org/abs/2310.09204) and [this repository](https://github.com/MartinAverseng/multi-screen-bem3D-ddm/)).
+It allows to define and manipulate <i> Generalized meshes</i>, which is a structure modeling meshes of non-manifold geometries. It includes in particular fractured meshes, useful for Finite Element Methods (FEM) in fractured domains, and inflated meshes useful for Boundary Element Methods (BEM) for non-manifold boundaries (see, e.g., [this paper](https://arxiv.org/abs/2310.09204) and [this repository](https://github.com/MartinAverseng/multi-screen-bem3D-ddm/)). It builds on open source toolboxes from [this project](https://github.com/matthieuaussal/gypsilab) for finite element quadratures, assembling and standard mesh management.
 
 | FEM Solution of a 2nd order boundary value problem in a randomly generated "fracture network" with Neumann conditions at the boundary | FEM in space/FD in time solution of the wave equation in the complement a complex obstacle |
 :----:|:-----:
@@ -192,6 +192,18 @@ This is equivalent to the linear system
 
 where the stiffness and mass matrices <b>K</b>, <b>M</b> are given by
 
-<b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>), &nbsp;&nbsp;&nbsp; <b>M</b><sub>i,j</sub> = (ϕ<sub><b>s</b><sub>i</sub></sub>,ϕ<sub><b>s</b><sub>j</sub></sub>)
+<b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>), &nbsp;&nbsp;&nbsp; <b>M</b><sub>i,j</sub> = (ϕ<sub><b>s</b><sub>i</sub></sub>,ϕ<sub><b>s</b><sub>j</sub></sub>) &nbsp;&nbsp;&nbsp; 1 <= i,j <= N<sub>dof</sub>
 
-where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M. 
+where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M.
+
+To assemble these matrices, call
+
+```
+nquad = 3;<br>
+domOmega = dom(M,nquad);
+```
+to construct local Gaussian quadrature rules on each element. Then called
+```
+M = integral(domOmega,Lambda0M,Lambda0M);<br>
+K = integral(domOmega,grad(Lambda0M),grad(Lambda0M));
+```
