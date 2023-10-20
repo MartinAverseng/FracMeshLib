@@ -30,7 +30,7 @@ The adjacency specifies, for each element i = 1,...,N, and each (n-1)-dimensiona
 
 #### Regular meshes
 
-Every <i>regular</i> mesh (of a manifold geometry) can be regarded as a Generalized meshes, by making two elements adjacent through F if and only if Si interesected with Sj is equal to F. Given a regular mesh `m` represented by a Gmsh-like structure (vertices,elements), call the class constructor
+Every <i>regular</i> mesh (of a manifold geometry) can be regarded as a Generalized mesh, by letting elements i and j be adjacent through F <i>iff</i> S<sub>i</sub> interesected with S<sub>j</sub> is equal to F. Given a regular mesh `m` represented by a Gmsh-like structure (vertices,elements), call the class constructor
 ```
 M = GeneralizedMesh(m)
 ```
@@ -39,7 +39,7 @@ to construct the corresponding generalized mesh.
 
 #### Fractured meshes
 
-Generalized meshes can also represent more complex geometries. Fractured meshes, such as the one represented below are important examples: they correspond to regular n-dimensional meshes in Rn, where some adjacencies have been "dropped" at some (n-1) dimensional interelement interfaces, creating a <i>fracture</i> (red edges below). They can be instanciated by calling
+Generalized meshes can also represent more complex geometries. <i>Fractured meshes</i>, such as the one represented below are important examples: they correspond to regular n-dimensional meshes in Rn, where some adjacencies have been "dropped" at some (n-1) dimensional interelement interfaces, creating a <i>fracture</i> (red edges below). They can be created by calling
 ```
 M = fracturedMesh(mOmega,mGamma)
 ```
@@ -47,12 +47,12 @@ where `mOmega` is a n-dimensional regular mesh and `mGamma` is a (n-1)-dimension
 
 
 <div>
-<img src="Examples/FracMeshExample.png" alt="Example of Fractured Mesh" width=500/>
+<img src="doc/FracMeshExample.png" alt="Example of Fractured Mesh" width=500/>
 </div>
 
 #### Inflated meshes
 
-Generalized meshes can also represent more exotic geometries than fractured domains, for instance by having several elements on top of each other. An important example is given by so-called <i>virtually inflated meshes</i> which naturally appear as the <i>boundaries</i> of fractured meshes, more on this below.
+Generalized meshes can also represent more exotic geometries, for instance by having several elements on top of each other. An important example is given by so-called <i>inflated meshes</i> which naturally appear as the <i>boundaries</i> of fractured meshes (see more below).
 
 
 ## Class definition and methods
@@ -81,18 +81,21 @@ The pair (`vtx`,`elt`) works like for a normal Gmsh-type mesh, except now the ar
 
 ### Subsimplices
 
-The d-subsimplices of a generalized mesh `M` are the d-subsets (S<sub>1</sub> ,...,S<sub>d</sub>) of the vertices of some element of `M`. Call
+The d-subsimplices of a generalized mesh `M` are all the d-subsimplices of its elements. Call
 
 ```  
 [Slist,set2sub,sub2set] = subsimplices(M,d)
 ```
-to get all d-subsimplices of M. The i-th line of Slist, `[Slist(i,1),...,Slist(i,d)]` encodes a unique subsimplex of `M`, referring to vertices by their index in `M.vtx`. `set2sub` is an array of size Nelt x Nd, where Nd = (d choose n) is the number of d-subsimplices per element. The k-th line of `set2sub` tells at what positions the subsimplices of element k are in `Slist`. `sub2set` is a `Nelt x N` sparse "incidence" matrix filled with 0s and 1s, with coefficient (k,i) equal to 1 when element k contains subsimplex i.
+to get all d-subsimplices of M. The i-th line of Slist, `[Slist(i,1),...,Slist(i,d)]` encodes a unique subsimplex S<sub>i</sub> of `M`, referring to vertices by their index in `M.vtx`.
+
+- `set2sub` is an array of size Nelt x Nd, where Nd = (n choose d) is the number of d-subsimplices per element. The k-th line of `set2sub` tells at what positions the subsimplices of element k are in `Slist`.
+- `sub2set` is a `Nelt x N` sparse "incidence" matrix filled with 0s and 1s, with coefficient (k,i) equal to 1 when element k contains subsimplex S<sub>i.
 
 ### Generalized subfacets
 
-Generalized subfacets are the central concept related to Generalized meshes, as far as FEM and BEM are concerned. For each vertex <math>S</math> in a generalized mesh, one can partition the elements incident to <math>S</math> in connected components, with two elements in the same component if they can be linked by a chain of adjacent elements all incident to <math>S</math>. Each component gamma gives rise to a <i>generalized vertex</i> at <math>S</math>, as represented below.
+Generalized subfacets are the central concept related to Generalized meshes when it comes to FEM and BEM. For each vertex <math>S</math> in a generalized mesh, one can partition the elements incident to <math>S</math> in connected components, with two elements in the same component if they can be linked by a chain of adjacent elements all incident to <math>S</math>. Each component gamma gives rise to a <i>generalized vertex</i> encoded by a pair <b>s</b> = (S,gamma). The sketch below shows a vertex with 3 associated generalized vertices: <b>s</b><sub>1</sub> = (S,{1}),  <b>s</b><sub>2</sub> = (S,{2,3,4}) and  <b>s</b><sub>3</sub> = (S,{5,6})
 <div align="center">
-<img src="Examples/genVert.jpg" alt="Sketch of generalized vertex" width=600/>
+<img src="doc/genVert.jpg" alt="Sketch of generalized vertex" width=600/>
 </div>
 Generalized d-subfacets are defined analogously. Call
 
@@ -105,7 +108,7 @@ to compute all generalized d-subfacets of `M`,  {<b>s</b> = (S,gamma)}. Generali
 - `Slist(i,:)`, the i-th line of `Slist`, is the d-subsimplex S
 - `gamma{i}` is the list of elements in the component gamma
 
-Moreover, I(i) refers to the the d-subsimplex S by its index as returned by `subsimplices(M,d)`.
+Moreover, `I(i)` refers to the the d-subsimplex S by its index as returned by `subsimplices(M,d)`.
 
 ### Refinement
 
@@ -120,16 +123,24 @@ to refine `M` p times (thereby reducing the elements diameters by a factor 2<sup
 
 ### Boundary
 
-The boundary of a n-dimensional Generalized Mesh M is a (n-1)-dimensional generalized mesh dM. Its definition is purely combinatorial, involving again chains of adjacent elements (cf the Fractured Meshes paper for details). If M stands for a normal, regular mesh, then dM stands for the usual boundary of M. The boundary of a generalized mesh is obtained by
+The boundary of a n-dimensional Generalized Mesh M is a (n-1)-dimensional generalized mesh dM. The definition of the boundary is purely combinatorial, involving again chains of adjacent elements (cf the Fractured Meshes paper for details). If M stands for a normal, regular mesh, then dM stands for the usual boundary of M. The boundary of a generalized mesh is obtained by
 
 ```
 dM = genBoundary(M)
 ```
+The sketch below illustrates the result when `M` is a fractured mesh as represented on the left. The generalized boundary is represented on the right. Note that in reality, each pair of red edges in the central cross are supposed to be exactly on top of each other (overlayed with the original fracture position), but they have been separated artificially to visualize the adjacency information more clearly. Note that both M and dM have 4 distinct generalized vertices at the cross point.
+![](doc/boundary.jpg)
 
 ### Intrinsic inflation
 
-When given only the simplices of the boundary of a fractured mesh, without the adjacency information, it is possible to recover this information automatically by an algorithm involving
+When given only the simplices of the boundary of a fractured mesh but no adjacency information (e.g., only the 4 red edges in the left panel of the previous figure), one can in fact recover all adjacency information (i.e., in the previous example, reconstruct the right "inflated" cross) geometrically, via a fast and automatic process. This algorithm is key to perform BEM on non-manifold boundaries dM without need for the mesh M. Given an input Gmsh-like (and possibly non-manifold) mesh `m` representing the geometry of the boundary, either an edge mesh in 2D or a triangular mesh in 3D, call
 
+```
+M = intrinsicInflation(m)
+```
+
+to use this algorithm. Roughly speaking, `M` represents a two sided version of `m`, with twice as many elements, each corresponding to one orientation of an initial element. The sketch below illustrates the concept.
+![](doc/inflation.png)
 
 ## Finite Element Methods in fractured Meshes
 
@@ -145,8 +156,10 @@ If M is a fractured mesh (the meshes suited to FEM) of Omega\\ Gamma, then Λ<su
 
 #### Conformity for BEM
 
-If dM is the boundary of a fractured mesh, and assuming that the fracture has no point contacts [Fractured meshes, Thm 5.2], then Λ<sup>0</sup>(dM) = Tr (Λ<sup>0</sup>(dM)) where Tr is the operator of restriction to the boundary (aka trace operator).
+If dM is the boundary of a fractured mesh, and assuming that the fracture has no point contacts [Fractured meshes, Thm 5.2], then
 
-The BEM workflow is thus: generate the generalized mesh from the normal mesh of the non-manifold surface mesh via the intrinsic inflation (no volume mesh required). Then the space Λ<sup>0</sup>(dM) is indeed the set of "multi-traces" of pw linear functions around dM. 
+Λ<sup>0</sup>(dM) = Tr (Λ<sup>0</sup>(dM))
 
-### Assembling of FEM matrices
+where Tr is the operator of restriction to the (two-sided) boundary (aka multi-trace operator).
+
+###
