@@ -194,16 +194,49 @@ where the stiffness and mass matrices <b>K</b>, <b>M</b> are given by
 
 <b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>), &nbsp;&nbsp;&nbsp; <b>M</b><sub>i,j</sub> = (ϕ<sub><b>s</b><sub>i</sub></sub>,ϕ<sub><b>s</b><sub>j</sub></sub>) &nbsp;&nbsp;&nbsp; 1 <= i,j <= N<sub>dof</sub>
 
-where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M.
+where <b>s</b><sub>1</sub>,...,<b>s</b><sub>N<sub>dof</sub></sub> is the set of generalized vertices of M. 
 
-To assemble these matrices, call
+To assemble these matrices, first call
 
 ```
-nquad = 3;<br>
+nquad = 3;
 domOmega = dom(M,nquad);
 ```
-to construct local Gaussian quadrature rules on each element. Then called
+to construct local Gaussian quadrature rules on each element. Then call
 ```
-M = integral(domOmega,Lambda0M,Lambda0M);<br>
+M = integral(domOmega,Lambda0M,Lambda0M);
 K = integral(domOmega,grad(Lambda0M),grad(Lambda0M));
+```
+where `Lambda0M = GenFem(M,'P1')`. If f(X) = sin(X<sub>1</sub>), then the right hand side vector can be computed via
+```
+f = @(X)(sin(X(:,1)));
+L = integral(domOmega,Lambda0M,f)
+```
+
+Solve the linear system using
+
+```
+c = 0.01;
+U = (K + c*M)\L;
+```
+Plot the solution e.g. using this code
+```
+close all;
+figure;
+patch('Faces',T,'Vertices',X,'FaceVertexCData',U,'FaceColor','interp','EdgeColor','interp');
+patch('Faces',mGamma.elt,"Vertices",mGamma.vtx,'LineWidth',3,'EdgeColor','k')
+caxis([min(min(U)),max(max(U))]);
+colormap(jet);
+axis equal
+title("Solution u")
+hold on
+
+c = colormap;
+[c1,c2] = caxis;
+nl = size(colormap,1);
+l = c1 + (c2 - c1)*(1:nl)/nl;
+drawLevelSet(M,U,l,'k');
+axis off
+title("Plot of solution U")
+colorbar;
 ```
