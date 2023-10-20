@@ -192,4 +192,6 @@ This is equivalent to the linear system
 
 where the stiffness and mass matrices <b>K</b>, <b>M</b> are given by
 
-<b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>)
+<b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>), &nbsp;&nbsp;&nbsp; <b>M</b><sub>i,j</sub> = (ϕ<sub><b>s</b><sub>i</sub></sub>,ϕ<sub><b>s</b><sub>j</sub></sub>)
+
+where <sub><b>s</b><sub>1</sub></sub>,...,<sub><b>N<sub>dof</sub></b><sub>1</sub></sub> is the set of generalized vertices of M. 
