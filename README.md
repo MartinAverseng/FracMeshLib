@@ -190,4 +190,6 @@ This is equivalent to the linear system
 
 (<b>K</b> + c<b>M</b>)U = L
 
-where  
+where the stiffness and mass matrices <b>K</b>, <b>M</b> are given by
+
+<b>K</b><sub>i,j</sub> = (∇ϕ<sub><b>s</b><sub>i</sub></sub>,∇ϕ<sub><b>s</b><sub>j</sub></sub>)
